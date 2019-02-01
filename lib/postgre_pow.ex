@@ -109,7 +109,7 @@ defmodule PostgrePow do
   defp _update(config, key, value) when not is_nil(value) do
     key = _key(config, key)
 
-    Repo.insert_all(PostgrePow.SessionStore, [%{key: key, value: value}],
+    PostgrePow.Repo.insert_all(PostgrePow.SessionStore, [%{key: key, value: value}],
       on_conflict: :replace_all_except_primary_key
     )
 
