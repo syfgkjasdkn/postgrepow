@@ -31,6 +31,12 @@ defmodule PostgrePow do
     _keys(config)
   end
 
+  # used only in tests
+  @doc false
+  def give_ets_away(to: pid) do
+    GenServer.call(__MODULE__, {:give_away_to, pid})
+  end
+
   @impl GenServer
   def init(_config) do
     __MODULE__ = :ets.new(__MODULE__, [:named_table])
@@ -52,6 +58,10 @@ defmodule PostgrePow do
         {:reply, :not_found,
          %{state | invalidators: update_invalidators(config, invalidators, key)}}
     end
+  end
+
+  def handle_call({:give_away_to, pid}, _from, state) do
+    {:reply, :ets.give_away(__MODULE__, pid, []), state}
   end
 
   @impl GenServer
@@ -110,7 +120,8 @@ defmodule PostgrePow do
     key = _key(config, key)
 
     PostgrePow.Repo.insert_all(PostgrePow.SessionStore, [%{key: key, value: value}],
-      on_conflict: :replace_all_except_primary_key
+      on_conflict: {:replace, [:value]},
+      conflict_target: [:key]
     )
 
     :ets.insert(__MODULE__, {key, value})
@@ -141,7 +152,8 @@ defmodule PostgrePow do
     |> PostgrePow.Repo.all()
   end
 
-  defp _key(config, key) do
+  @doc false
+  def _key(config, key) do
     namespace = Pow.Config.get(config, :namespace, "cache")
     "#{namespace}:#{key}"
   end
