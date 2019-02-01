@@ -26,7 +26,9 @@ defmodule PostgrePow.MixProject do
       {:pow, "~> 1.0"},
       {:benchee, "~> 0.13.2", only: :bench},
       {:ecto_sql, "~> 3.0"},
-      {:postgrex, ">= 0.0.0"}
+      {:postgrex, ">= 0.0.0"},
+      # jason is here just to fix phoenix warning (depended on by pow)
+      {:jason, "~> 1.1"}
     ]
   end
 
