@@ -42,7 +42,7 @@ defmodule PostgrePow do
     case PostgrePow.Repo.get(PostgrePow.SessionStore, key) do
       %PostgrePow.SessionStore{value: value} when not is_nil(value) ->
         # TODO deal with ttl
-        :ok = _update(config, key, value)
+        _update(config, key, value)
         {:reply, value, %{state | invalidators: update_invalidators(config, invalidators, key)}}
 
       _not_found ->
@@ -56,18 +56,18 @@ defmodule PostgrePow do
 
   @impl GenServer
   def handle_cast({:cache, config, key, value}, %__MODULE__{invalidators: invalidators} = state) do
-    :ok = _update(config, key, value)
+    _update(config, key, value)
     {:noreply, %{state | invalidators: update_invalidators(config, invalidators, key)}}
   end
 
   def handle_cast({:delete, config, key}, %__MODULE__{invalidators: invalidators} = state) do
-    :ok = _delete(config, key)
+    _delete(config, key)
     {:noreply, %{state | invalidators: clear_invalidator(invalidators, key)}}
   end
 
   @impl GenServer
   def handle_info({:invalidate, config, key}, %__MODULE__{invalidators: invalidators} = state) do
-    :ok = _delete(config, key)
+    _delete(config, key)
     {:noreply, %{state | invalidators: clear_invalidator(invalidators, key)}}
   end
 
