@@ -28,7 +28,8 @@ defmodule PostgrePow.MixProject do
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
       # jason is here just to fix phoenix warning (depended on by pow)
-      {:jason, "~> 1.1"}
+      {:jason, "~> 1.1"},
+      {:rexbug, "~> 1.0"}
     ]
   end
 

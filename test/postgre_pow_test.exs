@@ -101,10 +101,22 @@ defmodule PostgrePowTest do
   end
 
   describe "get" do
-    test "when ets doesn't have it but db does"
-    test "when ets has it and db has it as well"
-    test "when neither ets nor db have it"
-    test "when ets has it but db doesn't"
+    test "when ets doesn't have it but db does" do
+      key = "1234"
+      value = %{some: :value}
+      config = []
+
+      full_key = PostgrePow._key(config, key)
+
+      # insert into db
+      PostgrePow.Repo.insert_all(PostgrePow.SessionStore, [%{key: full_key, value: value}])
+
+      assert value == PostgrePow.get(config, key)
+
+      # verify it was cached in ets
+      true = PostgrePow.give_ets_away(to: self())
+      assert [{^full_key, ^value}] = :ets.lookup(PostgrePow, full_key)
+    end
   end
 
   describe "keys" do
