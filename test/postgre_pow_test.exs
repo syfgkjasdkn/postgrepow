@@ -126,7 +126,24 @@ defmodule PostgrePowTest do
       assert ["1234", "1235"] == PostgrePow.keys(config)
     end
 
-    test "loads keys (from db) even when ets doesn't have any", %{pid: pid} do
+    test "loads keys (from db) even when ets doesn't have any" do
+      key1 = "1234"
+      value1 = %{some: :value1}
+
+      key2 = "1235"
+      value2 = %{some: :value2}
+
+      config = []
+
+      PostgrePow.Repo.insert_all(
+        PostgrePow.SessionStore,
+        [
+          %{key: PostgrePow._key(config, key1), value: value1},
+          %{key: PostgrePow._key(config, key2), value: value2}
+        ]
+      )
+
+      assert ["1234", "1235"] == PostgrePow.keys(config)
     end
   end
 end
