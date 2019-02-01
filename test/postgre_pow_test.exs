@@ -59,6 +59,9 @@ defmodule PostgrePowTest do
 
       :ok = PostgrePow.put(config, key, value)
 
+      # waits for cast to complete
+      _ = :sys.get_state(pid)
+
       assert value == PostgrePow.get(config, key)
 
       :ok = PostgrePow.delete(config, key)
@@ -77,6 +80,9 @@ defmodule PostgrePowTest do
       full_key = PostgrePow._key(config, key)
 
       :ok = PostgrePow.put(config, key, value)
+
+      # waits for cast to complete
+      _ = :sys.get_state(pid)
 
       assert value == PostgrePow.get(config, key)
 
@@ -102,7 +108,25 @@ defmodule PostgrePowTest do
   end
 
   describe "keys" do
-    test "put, put, keys"
-    test "loads keys (from db) even when ets doesn't have any"
+    test "put, put, keys", %{pid: pid} do
+      key1 = "1234"
+      value1 = %{some: :value1}
+
+      key2 = "1235"
+      value2 = %{some: :value2}
+
+      config = []
+
+      :ok = PostgrePow.put(config, key1, value1)
+      :ok = PostgrePow.put(config, key2, value2)
+
+      # waits for casts to complete
+      _ = :sys.get_state(pid)
+
+      assert ["1234", "1235"] == PostgrePow.keys(config)
+    end
+
+    test "loads keys (from db) even when ets doesn't have any", %{pid: pid} do
+    end
   end
 end

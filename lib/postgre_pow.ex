@@ -145,11 +145,15 @@ defmodule PostgrePow do
   # maybe cache keys in an ets table
   defp _keys(config) do
     namespace = _key(config, "")
+    namespace_bytes = byte_size(namespace)
+    filter = "#{namespace}%"
 
     PostgrePow.SessionStore
-    |> where([s], like(s.key, fragment("?%", ^namespace)))
+    |> where([s], like(s.key, ^filter))
     |> select([s], s.key)
     |> PostgrePow.Repo.all()
+    # TODO maybe use composite key (namespace, key)
+    |> Enum.map(fn <<_namespace::size(namespace_bytes)-bytes>> <> key -> key end)
   end
 
   @doc false
