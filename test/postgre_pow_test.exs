@@ -37,19 +37,61 @@ defmodule PostgrePowTest do
       assert [{^full_key, ^value}] = :ets.lookup(PostgrePow, full_key)
     end
 
-    test "put and get" do
+    test "put and get", %{pid: pid} do
       key = "1234"
       value = %{some: :value}
       config = []
 
       :ok = PostgrePow.put(config, key, value)
+
+      # waits for cast to complete
+      _ = :sys.get_state(pid)
+
       assert value == PostgrePow.get(config, key)
     end
   end
 
   describe "delete" do
-    test "put, delete, and get"
-    test "deletes from db"
+    test "put, delete, and get", %{pid: pid} do
+      key = "1234"
+      value = %{some: :value}
+      config = []
+
+      :ok = PostgrePow.put(config, key, value)
+
+      assert value == PostgrePow.get(config, key)
+
+      :ok = PostgrePow.delete(config, key)
+
+      # waits for cast to complete
+      _ = :sys.get_state(pid)
+
+      assert :not_found == PostgrePow.get(config, key)
+    end
+
+    test "deletes from db", %{pid: pid} do
+      key = "1234"
+      value = %{some: :value}
+      config = []
+
+      full_key = PostgrePow._key(config, key)
+
+      :ok = PostgrePow.put(config, key, value)
+
+      assert value == PostgrePow.get(config, key)
+
+      # db has it
+      assert %PostgrePow.SessionStore{key: ^full_key, value: ^value} =
+               PostgrePow.Repo.get(PostgrePow.SessionStore, full_key)
+
+      :ok = PostgrePow.delete(config, key)
+
+      # waits for cast to complete
+      _ = :sys.get_state(pid)
+
+      # db doesn't have it anymore
+      refute PostgrePow.Repo.get(PostgrePow.SessionStore, full_key)
+    end
   end
 
   describe "get" do

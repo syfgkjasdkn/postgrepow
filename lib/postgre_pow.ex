@@ -53,7 +53,7 @@ defmodule PostgrePow do
 
       _not_found ->
         # TODO
-        :ok = _update(config, key, nil)
+        _update(config, key, nil)
 
         {:reply, :not_found,
          %{state | invalidators: update_invalidators(config, invalidators, key)}}
