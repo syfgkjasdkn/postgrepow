@@ -37,6 +37,11 @@ defmodule PostgrePow do
     GenServer.call(__MODULE__, {:give_away_to, pid})
   end
 
+  @doc false
+  def clean_ets do
+    GenServer.call(__MODULE__, :clean_ets)
+  end
+
   @impl GenServer
   def init(_config) do
     __MODULE__ = :ets.new(__MODULE__, [:named_table])
@@ -62,6 +67,10 @@ defmodule PostgrePow do
 
   def handle_call({:give_away_to, pid}, _from, state) do
     {:reply, :ets.give_away(__MODULE__, pid, []), state}
+  end
+
+  def handle_call(:clean_ets, _from, state) do
+    {:reply, :ets.delete_all_objects(__MODULE__), %{state | invalidators: %{}}}
   end
 
   @impl GenServer

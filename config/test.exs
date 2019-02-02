@@ -6,6 +6,8 @@ config :postgrepow, PostgrePow.Repo,
   pool_size: 10
 
 if System.get_env("CI") do
+  config :logger, level: :warn
+
   config :postgrepow, PostgrePow.Repo,
     username: System.get_env("DATABASE_POSTGRESQL_USERNAME"),
     password: System.get_env("DATABASE_POSTGRESQL_PASSWORD")
