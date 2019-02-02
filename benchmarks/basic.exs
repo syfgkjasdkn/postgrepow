@@ -27,11 +27,6 @@ reset_db = fn input ->
   |> Stream.run()
 end
 
-## TODO
-# clean_ets = fn ->
-#   nil
-# end
-
 restart_postgrepow = fn input ->
   reset_db.(input)
   PostgrePow.clean_ets()
@@ -41,15 +36,16 @@ end
 
 Benchee.run(
   %{
-    ## TODO
-    # "cold cache" =>
+    # TODO
+    # "always cold cache" =>
     #   {fn input ->
+    #      # clean ets here?
     #      Enum.each(input, fn {key, _data} ->
     #        PostgrePow.get(config, key)
     #      end)
     #    end,
     #    before_scenario: fn input ->
-    #      clean_ets.()
+    #      PostgrePow.clean_ets()
     #      input
     #    end},
     "cold -> hot cache" => fn input ->
