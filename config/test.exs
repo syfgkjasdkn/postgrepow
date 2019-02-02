@@ -7,6 +7,6 @@ config :postgrepow, PostgrePow.Repo,
 
 if System.get_env("CI") do
   config :postgrepow, PostgrePow.Repo,
-    username: System.get_env("POSTGRES_USER"),
-    password: System.get_env("POSTGRES_PASSWORD")
+    username: System.get_env("DATABASE_POSTGRESQL_USERNAME"),
+    password: System.get_env("DATABASE_POSTGRESQL_PASSWORD")
 end
