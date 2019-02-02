@@ -48,12 +48,12 @@ defmodule PostgrePow do
     case PostgrePow.Repo.get(PostgrePow.SessionStore, key) do
       %PostgrePow.SessionStore{value: value} when not is_nil(value) ->
         # TODO deal with ttl
-        _update_after_db(config, key, value)
+        _update_after_db(key, value)
         {:reply, value, %{state | invalidators: update_invalidators(config, invalidators, key)}}
 
       _not_found ->
         # TODO
-        _update_after_db(config, key, nil)
+        _update_after_db(key, nil)
 
         {:reply, :not_found,
          %{state | invalidators: update_invalidators(config, invalidators, key)}}
@@ -131,7 +131,7 @@ defmodule PostgrePow do
     :ets.insert(__MODULE__, {_key(config, key), value})
   end
 
-  defp _update_after_db(config, key, value) do
+  defp _update_after_db(key, value) do
     :ets.insert(__MODULE__, {key, value})
   end
 
